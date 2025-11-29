@@ -388,6 +388,7 @@
             transition: var(--transition);
             padding: 5px 10px;
             border-radius: 4px;
+	    transition: all 0.2s ease;	
         }
 
         .action-btn:hover {
@@ -406,8 +407,11 @@
 	.action-btn.voted {
     	    color: var(--accent-color);
     	    font-weight: bold;
-   	    cursor: not-allowed; /* Tıklanamaz işareti */
-    	    opacity: 1;
+    	    background-color: rgba(0, 200, 212, 0.1);
+	}
+	
+	.action-btn:active {
+   	    transform: scale(0.95);
 	}
 
 	/* Pasif buton (Diğeri) */
