@@ -20,6 +20,19 @@ const commentForm = document.getElementById('ghostyCommentForm');
 const commentList = document.getElementById('commentList');
 const noCommentsMsg = document.getElementById('noCommentsMsg');
 
+// --- YEREL HAFIZA YÖNETİMİ (LOCAL STORAGE) ---
+// Kullanıcının oy verdiği yorumları hafızadan getir
+const getLocalVotes = () => {
+    return JSON.parse(localStorage.getItem('ghosty_user_votes') || '{}');
+};
+
+// Oy durumunu hafızaya kaydet (örn: { "yorumID": "like" })
+const saveLocalVote = (docId, type) => {
+    const votes = getLocalVotes();
+    votes[docId] = type; // "like" veya "dislike" olarak kaydet
+    localStorage.setItem('ghosty_user_votes', JSON.stringify(votes));
+};
+
 // ---------------------------------------------------------
 // A) VERİLERİ CANLI ÇEKME
 // ---------------------------------------------------------
@@ -36,10 +49,14 @@ onSnapshot(q, (snapshot) => {
     } else {
         if(noCommentsMsg) noCommentsMsg.style.display = 'none';
         
+        // Kullanıcının daha önceki oylarını al
+        const userVotes = getLocalVotes();
+
         snapshot.forEach((document) => {
             const data = document.data();
             const docId = document.id;
-            renderComment(docId, data);
+            // Yorumu çizerken kullanıcının oy durumunu da gönderiyoruz
+            renderComment(docId, data, userVotes[docId]);
         });
     }
 });
@@ -77,7 +94,6 @@ if (commentForm) {
                     dislikes: 0
                 });
 
-                // Formu temizle
                 usernameInput.value = '';
                 commentInput.value = '';
 
@@ -93,13 +109,13 @@ if (commentForm) {
 }
 
 // ---------------------------------------------------------
-// C) YORUMU EKRANA BASMA (SİLME BUTONU YOK)
+// C) YORUMU EKRANA BASMA
 // ---------------------------------------------------------
-function renderComment(docId, data) {
+function renderComment(docId, data, userVoteStatus) {
     const newComment = document.createElement('div');
     newComment.classList.add('comment-item');
     
-    // HTML İçeriği (Sadece İsim, Tarih, Yorum ve Like/Dislike)
+    // HTML İçeriği
     newComment.innerHTML = `
         <div class="comment-header">
             <span class="comment-author">${escapeHtml(data.name)}</span>
@@ -112,14 +128,42 @@ function renderComment(docId, data) {
         </div>
     `;
 
-    // LIKE İşlemi
-    newComment.querySelector('.like-btn').addEventListener('click', async () => {
+    const likeBtn = newComment.querySelector('.like-btn');
+    const dislikeBtn = newComment.querySelector('.dislike-btn');
+
+    // --- BUTON DURUMLARINI AYARLA ---
+    if (userVoteStatus === 'like') {
+        likeBtn.classList.add('voted');      // Beğenilmiş (Renkli)
+        dislikeBtn.classList.add('disabled'); // Dislike pasif
+    } else if (userVoteStatus === 'dislike') {
+        dislikeBtn.classList.add('voted');    // Beğenilmemiş (Renkli)
+        likeBtn.classList.add('disabled');    // Like pasif
+    }
+
+    // --- LIKE İŞLEMİ ---
+    likeBtn.addEventListener('click', async () => {
+        if (getLocalVotes()[docId]) return; // Zaten oy vermişse dur
+
+        // Görsel güncelleme (anında tepki için)
+        likeBtn.classList.add('voted');
+        dislikeBtn.classList.add('disabled');
+        
+        // Veritabanı ve Hafıza
+        saveLocalVote(docId, 'like');
         const commentRef = doc(db, "comments", docId);
         await updateDoc(commentRef, { likes: increment(1) });
     });
 
-    // DISLIKE İşlemi
-    newComment.querySelector('.dislike-btn').addEventListener('click', async () => {
+    // --- DISLIKE İŞLEMİ ---
+    dislikeBtn.addEventListener('click', async () => {
+        if (getLocalVotes()[docId]) return; // Zaten oy vermişse dur
+
+        // Görsel güncelleme
+        dislikeBtn.classList.add('voted');
+        likeBtn.classList.add('disabled');
+
+        // Veritabanı ve Hafıza
+        saveLocalVote(docId, 'dislike');
         const commentRef = doc(db, "comments", docId);
         await updateDoc(commentRef, { dislikes: increment(1) });
     });

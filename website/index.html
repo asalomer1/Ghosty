@@ -401,6 +401,20 @@
         .action-btn.disliked {
             color: var(--error-color);
         }
+	
+	/* Oy verilmiş butonun rengi (Turkuaz) */
+	.action-btn.voted {
+    	    color: var(--accent-color);
+    	    font-weight: bold;
+   	    cursor: not-allowed; /* Tıklanamaz işareti */
+    	    opacity: 1;
+	}
+
+	/* Pasif buton (Diğeri) */
+	.action-btn.disabled {
+   	    opacity: 0.3;
+   	    pointer-events: none; /* Tıklamayı engelle */
+	}
 
         .empty-message {
             text-align: center;
