@@ -375,6 +375,13 @@
             border-top: 1px solid #222;
             padding-top: 10px;
         }
+	
+	/* Oy verilmiş butonun rengi (Turkuaz) */
+	.action-btn.voted {
+    	    color: var(--accent-color);
+    	    font-weight: bold;
+    	    background-color: rgba(0, 200, 212, 0.1);
+	}
 
         .action-btn {
             background: none;
@@ -391,6 +398,10 @@
 	    transition: all 0.2s ease;	
         }
 
+	.action-btn:active {
+   	    transform: scale(0.95);
+	}
+
         .action-btn:hover {
             background-color: rgba(255,255,255,0.05);
         }
@@ -402,17 +413,6 @@
         .action-btn.disliked {
             color: var(--error-color);
         }
-	
-	/* Oy verilmiş butonun rengi (Turkuaz) */
-	.action-btn.voted {
-    	    color: var(--accent-color);
-    	    font-weight: bold;
-    	    background-color: rgba(0, 200, 212, 0.1);
-	}
-	
-	.action-btn:active {
-   	    transform: scale(0.95);
-	}
 
 	/* Pasif buton (Diğeri) */
 	.action-btn.disabled {
