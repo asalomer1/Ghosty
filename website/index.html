@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghosty — Temassız Kontrol Yazılımı</title>
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --bg-color: #0d0d0d;
+            --surface-color: #161616;
+            --surface-hover: #1f1f1f;
+            --accent-color: #00c8d4;
+            --accent-hover: #00a0aa;
+            --error-color: #ff4d4d;
+            --warning-color: #ffc107;
+            --text-main: #ffffff;
+            --text-muted: #b3b3b3;
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* --- UTILITIES --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px rgba(0, 200, 212, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            box-shadow: 0 0 20px rgba(0, 200, 212, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-color);
+            color: var(--text-main);
+            border: 1px solid #333;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--surface-hover);
+            border-color: var(--accent-color);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        section {
+            padding: 80px 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        /* --- HEADER --- */
+        header {
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background-color: rgba(13, 13, 13, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid #222;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            height: 45px; 
+            width: auto;  
+            margin-right: 15px; 
+            border-radius: 8px; 
+        }
+
+        .nav-links a {
+            margin-left: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* --- HERO SECTION --- */
+        #hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0d 70%);
+            padding-top: 80px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .hero-content span {
+            color: var(--accent-color);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* --- ABOUT & FEATURES --- */
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        /* VİDEO İÇİN STİL */
+        .about-video {
+            width: 100%;             /* Alanı tam kapla */
+            height: auto;            /* Orantıyı bozma */
+            border-radius: var(--border-radius); 
+            border: 1px solid var(--accent-color); 
+            box-shadow: 0 0 20px rgba(0, 200, 212, 0.15); 
+            object-fit: cover;
+            display: block;
+        }
+
+        /* --- GUIDE SECTION --- */
+        .guide-steps {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .step-card {
+            background-color: var(--surface-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            border: 1px solid transparent;
+            display: flex;
+            flex-direction: column;
+            height: 100%; 
+        }
+
+        .step-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .step-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            flex-grow: 1; 
+        }
+
+        /* --- DOWNLOAD SECTION --- */
+        #download {
+            text-align: center;
+            background-color: var(--surface-color);
+        }
+
+        .download-box {
+            background-color: var(--bg-color);
+            padding: 50px;
+            border-radius: var(--border-radius);
+            border: 1px solid #333;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .warning-box {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: rgba(255, 193, 7, 0.05);
+            border: 1px solid var(--warning-color);
+            border-radius: var(--border-radius);
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .warning-title {
+            color: var(--warning-color);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .warning-list li {
+            margin-bottom: 8px;
+            color: #ccc;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .warning-list li::before {
+            content: "•";
+            color: var(--warning-color);
+            position: absolute;
+            left: 0;
+        }
+
+        .sys-req {
+            margin-top: 30px;
+            text-align: left;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            background: #111;
+            padding: 20px;
+            border-radius: var(--border-radius);
+        }
+
+        .sys-req strong {
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* --- COMMENTS SECTION --- */
+        .comment-form {
+            background-color: var(--surface-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid #333;
+            padding: 15px;
+            color: white;
+            border-radius: var(--border-radius);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            border-color: var(--accent-color);
+        }
+
+        .comment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .comment-item {
+            background-color: var(--surface-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border-left: 3px solid #333;
+            animation: fadeIn 0.5s ease;
+            transition: var(--transition);
+        }
+        
+        .comment-item:hover {
+            border-left-color: var(--accent-color);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .comment-date {
+            color: #555;
+            font-size: 0.8rem;
+        }
+
+        .comment-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+            border-top: 1px solid #222;
+            padding-top: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .action-btn.liked {
+            color: var(--accent-color);
+        }
+        
+        .action-btn.disliked {
+            color: var(--error-color);
+        }
+
+        .empty-message {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+            font-style: italic;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid #222;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-links a {
+            margin: 0 10px;
+            color: var(--text-main);
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease forwards;
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (min-width: 768px) {
+            .guide-steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 2.5rem; }
+            .split-layout { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <img src="ghosty.png" alt="Ghosty Logo" class="logo-img">
+                    GHOSTY
+                </a>
+                <div class="nav-links">
+                    <a href="#about">Nedir?</a>
+                    <a href="#guide">Kılavuz</a>
+                    <a href="#comments">Yorumlar</a>
+                    <a href="#download" style="color: var(--accent-color);">İndir</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section id="hero">
+        <div class="container hero-content fade-in">
+            <h1>Ghosty <br> <span>Temassız Kontrol Yazılımı</span></h1>
+            <p>El hareketlerinizle bilgisayarınızı özgürce yönetin. <br>Fiziksel temas yok, sınır yok.</p>
+            <div class="hero-buttons">
+                <a href="#download" class="btn btn-primary">Şimdi İndir</a>
+                <a href="#guide" class="btn btn-secondary">Kullanım Kılavuzu</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container">
+            <div class="split-layout">
+                <div>
+                    <h2 class="section-title">Ghosty Nedir?</h2>
+                    <p class="section-subtitle">Yeni nesil insan-bilgisayar etkileşimi.</p>
+                    <p style="color: #ccc; margin-bottom: 20px;">
+                        Ghosty, web kameranızı kullanarak el hareketlerinizi algılar ve bunları fare komutlarına dönüştürür. Ekstra bir donanıma ihtiyaç duymadan, sadece yazılım gücüyle bilgisayarınızı uzaktan kontrol etmenizi sağlar.
+                    </p>
+                    <ul style="color: #ccc; line-height: 2;">
+                        <li>✓ Yüksek hassasiyetli el takibi</li>
+                        <li>✓ Özelleştirilebilir hareketler</li>
+                        <li>✓ Düşük CPU kullanımı</li>
+                        <li>✕ Hayır, sizi izlemiyorum</li>
+                    </ul>
+                </div>
+                <div>
+                    <video autoplay loop muted playsinline class="about-video">
+                        <source src="ghosty_giff.mp4" type="video/mp4">
+                        Tarayıcınız video etiketini desteklemiyor.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="guide">
+        <div class="container">
+            <h2 class="section-title">Nasıl Kullanılır?</h2>
+            <p class="section-subtitle">Ghosty ile kontrolü ele almak sadece 4 adım.</p>
+            
+            <div class="guide-steps">
+                <div class="step-card">
+                    <span class="step-number">01</span>
+                    <h3 class="step-title">Kurulum ve Kalibrasyon</h3>
+                    <p class="step-desc">Uygulamayı indirin ve kurun. İlk açılışta kameranızın elinizi net gördüğünden emin olun. Işıklandırmanın yeterli ve elinizin kameraya paralel konumda olması performansı artırır.</p>
+                </div>
+                
+                <div class="step-card">
+                    <span class="step-number">02</span>
+                    <h3 class="step-title">Hareketleri Tanıyın</h3>
+                    <p class="step-desc">İşaret parmağının en alt eklemi fareyi hareket ettirir. Başparmak ve işaret parmağını birleştirmek <strong>"Sol Tıkla"</strong>, başparmak ve serçe parmağını birleştirmek <strong>"Sağ Tıkla"</strong> komutudur.</p>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">03</span>
+                    <h3 class="step-title">Ayarları Kişiselleştirin</h3>
+                    <p class="step-desc">Başlangıç ayarları genel kullanım içindir. Ancak programı kendi kullanım alışkanlığınıza göre özelleştirebilirsiniz.</p>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">04</span>
+                    <h3 class="step-title">Hassasiyet ve Gecikme</h3>
+                    <p class="step-desc">Arayüzdeki <strong>"Hassasiyet"</strong> ayarı farenizin hassasiyetini değiştirmez. Bu ayar çubuğu ile parmaklar arasındaki mesafenin hangi aralıkta etkileşime gireceğini ayarlayabilirsiniz, <strong>"Sürükleme Gecikmesi"</strong> ile kaç saniye bekledikten sonra sürükleme moduna geçeceğini ayarlayabilirsiniz.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="download">
+        <div class="container">
+            <div class="download-box">
+                <h2 class="section-title">Ghosty'i Keşfet</h2>
+                <p style="margin-bottom: 30px; color: #ccc;">Windows işletim sistemi için hemen ücretsiz indirin.</p>
+                <a href="#" class="btn btn-primary" style="font-size: 1.2rem; padding: 15px 50px;">Windows İçin İndir (v1.0)</a>
+
+                <div class="warning-box">
+                    <span class="warning-title">⚠ Önemli Notlar</span>
+                    <ul class="warning-list">
+                        <li><strong>Antivirüs Uyarısı:</strong> Yazılım mouse kontrolü yaptığı için bazı antivirüsler "Yanlış Alarm" (False Positive) verebilir. Bu beklenen bir durumdur, güvenle istisna ekleyebilirsiniz.</li>
+                        <li><strong>Oyunlarda Kullanım:</strong> Rekabetçi oyunların (Valorant, CS2 vb.) hile koruma sistemleri yazılımsal mouse hareketlerini riskli bulabilir. Ban riski nedeniyle "anti-cheat" yazılımı içeren oyunlarda kullanılması önerilmez.</li>
+                    </ul>
+                </div>
+
+                <div class="sys-req">
+                    <strong>Sistem Gereksinimleri:</strong>
+                    <ul>
+                        <li>OS: Windows 10 / 11 (64-bit)</li>
+                        <li>Kamera: Standart 720p Webcam</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="comments">
+        <div class="container">
+            <h2 class="section-title">Kullanıcı Yorumları</h2>
+            <p class="section-subtitle">Deneyimlerinizi, geri bildirimlerinizi veya önerilerinizi üye olmadan paylaşın.</p>
+
+            <div class="comment-form">
+                <form id="ghostyCommentForm">
+                    <div class="form-group">
+                        <input type="text" id="username" class="form-input" placeholder="Adınız / Rumuz (İsteğe bağlı)">
+                    </div>
+                    <div class="form-group">
+                        <textarea id="usercomment" class="form-textarea" rows="4" placeholder="Ghosty hakkındaki düşünceleriniz..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Yorumu Gönder</button>
+                </form>
+            </div>
+
+            <div class="comment-list" id="commentList">
+                <div id="noCommentsMsg" class="empty-message">Henüz yorum yapılmamış. İlk yorumu siz yapın!</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>İletişim için:</p>
+            <div class="footer-links" style="margin-top: 10px;">
+                <a href="mailto:omerasal2706@gmail.com">omerasal2706@gmail.com</a>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
