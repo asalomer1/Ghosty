@@ -1,10 +1,10 @@
-# 👻 Ghosty
+# Ghosty
 
 ## Görüntü İşleme ile Temassız Bilgisayar Kontrolü
 
 <img width="512" height="468" alt="ghosty (2)" src="https://github.com/user-attachments/assets/269ce4f0-4e18-483d-905f-715cf9045cb2" />
 
-## Websitesine Göz Atmayı Unutmayın
+## 🌐 Websitesine Göz Atmayı Unutmayın
 https://ghosty-lilac.vercel.app
 
 ## 🚀 Proje Hakkında ve Özellikler
